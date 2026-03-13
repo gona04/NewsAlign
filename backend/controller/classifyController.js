@@ -2,7 +2,13 @@ import { loadUnNeutralizedHeadlines, scrapeAndSaveHeadlines } from '../../tensor
 import { classifyUserStatementService } from '../services/classifyService.js';
 import { buildIndex } from '../services/vectorStore.js';
 
-scrapeAndSaveHeadlines()
+// Build index once on server startup
+scrapeAndSaveHeadlines().then(() => {
+  const news = loadUnNeutralizedHeadlines();
+  buildIndex(news);
+  console.log('Vector index built');
+});
+
 export const classify = async (req, res) => {
   const { userInput } = req.body;
   if (!userInput) {
@@ -10,18 +16,12 @@ export const classify = async (req, res) => {
   }
   try {
     const result = await classifyUserStatementService(userInput);
-    res.json(result);
+    return res.json(result); // ← only called once
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
 
 export const news = async (req, res) => {
-    return res.status(200).json({data: getNews()})
-}
-
-function getNews() {
-    let news = loadUnNeutralizedHeadlines();
-    buildIndex(news);
-    return news;
-}
+  return res.status(200).json({ data: loadUnNeutralizedHeadlines() });
+};
