@@ -1,11 +1,12 @@
 import React from 'react';
 import { useFactCheck } from '../../context/FactCheckContext';
+import './mode-selector.css'
 
 function ModeSelector() {
   const { isNLP, setNLP } = useFactCheck();
 
   return (
-    <div style={{ margin: '1rem 0' }}>
+    <div className='drop-down-container'>
       <label htmlFor="mode-select"><strong>Fact-Check Mode: </strong></label>
       <select
         id="mode-select"
