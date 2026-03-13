@@ -9,8 +9,11 @@ import ModeSelector from './component/mode-selector/mode-selector';
 function App() {
   return (
     <FactCheckProvider>
-      <div>
-        <h1>Most Recent News</h1>
+      <div className="app-shell">
+        <header className="hero-panel">
+          <h1 className="app-title">Most Recent News</h1>
+          <p className="app-subtitle">Illustrated, soft-depth dashboard for fast fact checking.</p>
+        </header>
         <ModeSelector />
         <News />
         <FactCheckForm />

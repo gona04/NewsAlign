@@ -36,7 +36,7 @@ function FactCheckForm() {
       <form className="fact-form" onSubmit={handleSubmit}>
         <input
           type="text"
-          className="fact-input"
+          className="fact-input neu-input"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="Enter your statement"

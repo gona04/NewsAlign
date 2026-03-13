@@ -5,9 +5,10 @@ function ModeSelector() {
   const { isNLP, setNLP } = useFactCheck();
 
   return (
-    <div style={{ margin: '1rem 0' }}>
-      <label htmlFor="mode-select"><strong>Fact-Check Mode: </strong></label>
+    <div className="app-container mode-selector">
+      <label htmlFor="mode-select">Fact-Check Mode</label>
       <select
+        className="neu-select"
         id="mode-select"
         value={isNLP ? 'nlp' : 'llm'}
         onChange={e => setNLP(e.target.value === 'nlp')}
