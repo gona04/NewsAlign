@@ -8,6 +8,7 @@ function App() {
   return (
     <div>
       <h1>Most Recent News</h1>
+      
       <News/>
       <FactCheckForm/>
       </div>

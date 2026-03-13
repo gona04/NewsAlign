@@ -1,5 +1,6 @@
 import { loadUnNeutralizedHeadlines, scrapeAndSaveHeadlines } from '../../tensor-flow-model/userInput/handelingUserInput.js';
 import { classifyUserStatementService } from '../services/classifyService.js';
+import { buildIndex } from '../services/vectorStore.js';
 
 scrapeAndSaveHeadlines()
 export const classify = async (req, res) => {
@@ -21,5 +22,6 @@ export const news = async (req, res) => {
 
 function getNews() {
     let news = loadUnNeutralizedHeadlines();
+    buildIndex(news);
     return news;
 }
