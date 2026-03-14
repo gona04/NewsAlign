@@ -1,26 +1,54 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import News from './component/news/news';
-import './style.css';
-import FactCheckForm from './component/fact-checking/fact-checking-form';
+import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import { FactCheckProvider } from './context/FactCheckContext';
+import News from './component/news/news';
+import FactCheckForm from './component/fact-checking/fact-checking-form';
 import ModeSelector from './component/mode-selector/mode-selector';
+import LoginPage from './component/auth/login/login-page';
+import UserMenu from './component/auth/user-menu/user-menue';
+import './style.css';
 
 function App() {
-  return (
-    <FactCheckProvider>
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  if (isLoading) {
+    return (
       <div className="app-shell">
-        <header className="hero-panel">
-          <h1 className="app-title">Most Recent News</h1>
-          <p className="app-subtitle">Illustrated, soft-depth dashboard for fast fact checking.</p>
-        </header>
-        <ModeSelector />
-        <News />
-        <FactCheckForm />
+        <div className="app-container" style={{ textAlign: 'center', padding: '2rem' }}>
+          Loading...
+        </div>
       </div>
-    </FactCheckProvider>
+    );
+  }
+
+  if (!isAuthenticated) return <LoginPage />;
+
+  return (
+    <div className="app-shell">
+      <div className="app-header app-container">
+        <h1 className="app-title">Fact Checker</h1>
+        <UserMenu />
+      </div>
+      <ModeSelector />
+      <News />
+      <FactCheckForm />
+    </div>
   );
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render(
+  <Auth0Provider
+    domain={process.env.REACT_APP_0_AUTH_FACT_CHECKING_APP_DOMAIN}
+    clientId={process.env.REACT_APP_0_AUTH_FACT_CHECKING_APP_CLIENT_ID}
+    authorizationParams={{
+      redirect_uri: window.location.origin,
+      audience: process.env.REACT_APP_0_AUTH_FACT_CHECKING_APP_AUDIENCE,
+    }}
+  >
+    <FactCheckProvider>
+      <App />
+    </FactCheckProvider>
+  </Auth0Provider>
+);

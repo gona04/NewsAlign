@@ -20,10 +20,25 @@
 
 .fact-input {
   flex: 1;
+  background: var(--surface-strong);
+  height:3rem;
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+  border-radius: 14px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  color: var(--text-main);
+  border: 1px solid transparent;
+}
+
+.fact-input:focus {
+  outline: none;
+  border-color: var(--outline-soft);
+  box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 3px var(--outline-soft);
 }
 
 .fact-submit {
   min-height: 44px;
+  max-width: 130px;
 }
 
 .fact-submit:disabled {
