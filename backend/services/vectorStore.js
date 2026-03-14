@@ -32,7 +32,7 @@ export async function buildIndex(articles) {
   console.log(`Index built with ${validArticles.length} articles`);
 }
 
-export async function searchIndex(query, topK = 5) {
+export async function searchIndex(query, topK = 3) {
   if (!query || query.trim() === '') {
     throw new Error('Query cannot be empty');
   }

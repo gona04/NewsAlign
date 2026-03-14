@@ -3,14 +3,19 @@ import React, { createContext, useContext, useState } from 'react';
 const FactCheckContext = createContext();
 
 export function FactCheckProvider({ children }) {
-  const [isNLP, setNLP] = useState(true);
+  const [mode, setMode] = useState('nlp'); // 'nlp' | 'nlp-vector' | 'llm'
 
-  const apiBase = isNLP
-    ? `${process.env.REACT_APP_API_URL}/api`
-    : `${process.env.REACT_APP_API_URL}/fact-checking`;
+  // Keep isNLP as a derived value for backward compatibility
+  const isNLP = mode !== 'llm';
+
+  const apiBase = {
+    'nlp': `${process.env.REACT_APP_API_URL}/api`,
+    'nlp-vector': `${process.env.REACT_APP_API_URL}/api`,
+    'llm': `${process.env.REACT_APP_API_URL}/fact-checking`,
+  }[mode];
 
   return (
-    <FactCheckContext.Provider value={{ isNLP, setNLP, apiBase }}>
+    <FactCheckContext.Provider value={{ mode, setMode, isNLP, apiBase }}>
       {children}
     </FactCheckContext.Provider>
   );
