@@ -102,7 +102,7 @@ body {
   background: var(--surface-strong);
   color: var(--text-main);
   box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-  padding: 10px 14px;
+  padding: 6px 10px;
   font-size: 1rem;
   width: 100%;
 }
