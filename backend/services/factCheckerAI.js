@@ -5,7 +5,7 @@ import { searchIndex } from './vectorStore.js';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function factCheck(statement) {
-  const relevantArticles = await searchIndex(statement, 5);
+  const relevantArticles = await searchIndex(statement, 3);
 
   if (relevantArticles.length === 0) {
     return {

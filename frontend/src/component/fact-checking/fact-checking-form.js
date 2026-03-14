@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import './fact-checking-form.css';
-import { useFactCheck } from '../../context/FactCheckContext';
-import FactCheckResult from './fact-checking-resuls/factCheckingResults';
+import React, { useState } from "react";
+import "./fact-checking-form.css";
+import { useFactCheck } from "../../context/FactCheckContext";
+import FactCheckResult from "./fact-checking-resuls/factCheckingResults";
 
 function FactCheckForm() {
-  const { isNLP, apiBase } = useFactCheck();
-  const [userInput, setUserInput] = useState('');
+  const { mode, apiBase } = useFactCheck();
+  const [userInput, setUserInput] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,18 +14,22 @@ function FactCheckForm() {
     setLoading(true);
     setResult(null);
 
-    const endpoint = isNLP ? `${apiBase}/classify` : `${apiBase}/fact-check`;
+    const endpoint = {
+      nlp: `${apiBase}/classify`,
+      "nlp-vector": `${apiBase}/vector-classify`,
+      llm: `${apiBase}/fact-check`,
+    }[mode];
 
     try {
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userInput }),
       });
       const data = await response.json();
       setResult(data);
     } catch (err) {
-      setResult({ error: 'Something went wrong.' });
+      setResult({ error: "Something went wrong." });
     }
     setLoading(false);
   };
@@ -36,7 +40,7 @@ function FactCheckForm() {
       <form className="fact-form" onSubmit={handleSubmit}>
         <input
           type="text"
-          className="fact-input"
+          className="fact-input neu-input"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="Enter your statement"
@@ -46,7 +50,7 @@ function FactCheckForm() {
           type="submit"
           disabled={loading || !userInput}
         >
-          {loading ? 'Checking...' : 'Check'}
+          {loading ? "Checking..." : "Check"}
         </button>
       </form>
 
