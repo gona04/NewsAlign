@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import { FactCheckProvider } from './context/FactCheckContext';
+import { UsageLimitProvider } from './context/Usage-Limit-Context';
 import LoginPage from './component/auth/login/login-page';
 import UserMenu from './component/auth/user-menu/user-menue';
 import './style.css';
@@ -13,11 +14,6 @@ const ModeSelector = lazy(() => import('./component/mode-selector/mode-selector'
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
 
-  // Show login page immediately while Auth0 checks session
-  // This prevents the blank/spinning screen on first load
-  if (!isAuthenticated && !isLoading) return <LoginPage />;
-
-  // Show a minimal loading state only during the Auth0 session check
   if (isLoading) {
     return (
       <div className="auth-container">
@@ -29,24 +25,28 @@ function App() {
     );
   }
 
+  if (!isAuthenticated) return <LoginPage />;
+
   return (
-    <div className="app-shell">
-      <div className="app-header app-container">
-        <h1 className="app-title">Fact Checker</h1>
-        <Suspense fallback={<div style={{ padding: '0.5rem' }}>...</div>}>
-          <UserMenu />
+    <UsageLimitProvider>
+      <div className="app-shell">
+        <div className="app-header app-container">
+          <h1 className="app-title">Fact Checker</h1>
+          <Suspense fallback={<div style={{ padding: '0.5rem' }}>...</div>}>
+            <UserMenu />
+          </Suspense>
+        </div>
+        <Suspense fallback={
+          <div className="app-container" style={{ padding: '1rem', color: 'var(--text-muted)' }}>
+            Loading...
+          </div>
+        }>
+          <ModeSelector />
+          <News />
+          <FactCheckForm />
         </Suspense>
       </div>
-      <Suspense fallback={
-        <div className="app-container" style={{ padding: '1rem', color: 'var(--text-muted)' }}>
-          Loading...
-        </div>
-      }>
-        <ModeSelector />
-        <News />
-        <FactCheckForm />
-      </Suspense>
-    </div>
+    </UsageLimitProvider>
   );
 }
 

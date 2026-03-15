@@ -1,5 +1,6 @@
 import { factCheck } from '../services/factCheckerAI.js';
 import { checkAndIncrementUsage, logActivity } from '../services/usageService.js';
+import { MAX_DAILY_CALLS } from '../utils/constants.js';
 
 export const checkingFacts = async (req, res) => {
   const t0 = Date.now();
@@ -20,7 +21,7 @@ export const checkingFacts = async (req, res) => {
 
     if (!usage.allowed) {
       return res.status(429).json({
-        error: 'You have used all 6 of your daily AI fact-checks.',
+        error: `You have used all ${MAX_DAILY_CALLS} of your daily AI fact-checks.`,
         resetsAt: usage.resetsAt,
       });
     }

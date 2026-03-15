@@ -2,24 +2,25 @@ import React, { useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import './fact-checking-form.css';
 import { useFactCheck } from '../../context/FactCheckContext';
+import { useUsageLimit } from '../../context/Usage-Limit-Context';
 import FactCheckResult from './fact-checking-resuls/factCheckingResults';
-import { MAX_DAILY_CALLS } from '../../utils/constant';
-import { hasReachedLimit, incrementUsage, getRemainingCalls, getResetTime } from '../../utils/usageLimit';
-
 
 function FactCheckForm() {
-  const { getAccessTokenSilently, user } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
   const { mode, apiBase, setUsedMode } = useFactCheck();
+  const {
+    MAX_DAILY_CALLS,
+    remaining,
+    resetTime,
+    isAdmin,
+    checkLimit,
+    consumeCall,
+  } = useUsageLimit();
+
   const [userInput, setUserInput] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const tokenRef = useRef(null);
-
-  const userId = user?.sub;
-  const roles = user?.['https://fact-checker/roles'] || [];
-  const isAdmin = roles.includes('admin');
-  const remaining = isAdmin ? Infinity : getRemainingCalls(userId);
-  const resetTime = getResetTime(userId);
 
   const getToken = async () => {
     if (tokenRef.current) return tokenRef.current;
@@ -37,7 +38,7 @@ function FactCheckForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isAdmin && hasReachedLimit(userId)) {
+    if (checkLimit()) {
       setResult({
         error: `You have used all ${MAX_DAILY_CALLS} of your daily AI fact-checks. Resets at ${resetTime?.toLocaleTimeString()}.`,
       });
@@ -70,7 +71,7 @@ function FactCheckForm() {
       }
 
       const data = await response.json();
-      if (!isAdmin) incrementUsage(userId);
+      consumeCall();
       setResult(data);
     } catch (err) {
       setResult({ error: 'Something went wrong. Please try again.' });

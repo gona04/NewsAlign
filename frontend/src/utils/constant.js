@@ -1,1 +1,0 @@
-export const MAX_DAILY_CALLS = 4;
