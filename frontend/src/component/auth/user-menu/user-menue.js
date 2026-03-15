@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import '../../auth/auth.css';
+import { MAX_DAILY_CALLS } from '../../../utils/constant';
 
 const API_URL = process.env.REACT_APP_API_URL;
-const MAX_CALLS = 6;
 
 function UserMenu() {
   const { user, logout, getAccessTokenSilently } = useAuth0();
@@ -42,7 +42,7 @@ function UserMenu() {
           ) : (
             callsUsed !== null && (
               <span className="user-calls">
-                {MAX_CALLS - callsUsed} of {MAX_CALLS} AI calls remaining
+                {MAX_DAILY_CALLS - callsUsed} of {MAX_DAILY_CALLS} AI calls remaining
               </span>
             )
           )}

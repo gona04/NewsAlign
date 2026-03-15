@@ -1,54 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import './fact-checking-form.css';
 import { useFactCheck } from '../../context/FactCheckContext';
 import FactCheckResult from './fact-checking-resuls/factCheckingResults';
-import { hasReachedLimit, incrementUsage, getRemainingCalls, getResetTime } from '../../utils/useage';
+import { MAX_DAILY_CALLS } from '../../utils/constant';
+import { hasReachedLimit, incrementUsage, getRemainingCalls, getResetTime } from '../../utils/usageLimit';
 
-const MAX_CALLS = 4;
 
 function FactCheckForm() {
   const { getAccessTokenSilently, user } = useAuth0();
-  const { mode, apiBase } = useFactCheck();
+  const { mode, apiBase, setUsedMode } = useFactCheck();
   const [userInput, setUserInput] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const tokenRef = useRef(null);
 
+  const userId = user?.sub;
   const roles = user?.['https://fact-checker/roles'] || [];
   const isAdmin = roles.includes('admin');
+  const remaining = isAdmin ? Infinity : getRemainingCalls(userId);
+  const resetTime = getResetTime(userId);
 
-  const remaining = isAdmin ? Infinity : getRemainingCalls();
-  const resetTime = getResetTime();
+  const getToken = async () => {
+    if (tokenRef.current) return tokenRef.current;
+    const token = await getAccessTokenSilently();
+    tokenRef.current = token;
+    return token;
+  };
 
   const getEndpoint = () => ({
-    'nlp':        `${apiBase}/classify`,
+    nlp:          `${apiBase}/classify`,
     'nlp-vector': `${apiBase}/vector-classify`,
-    'llm':        `${apiBase}/fact-check`,
+    llm:          `${apiBase}/fact-check`,
   }[mode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isAdmin && hasReachedLimit()) {
+    if (!isAdmin && hasReachedLimit(userId)) {
       setResult({
-        error: `You have used all ${MAX_CALLS} of your daily AI fact-checks. Your limit resets at ${resetTime?.toLocaleTimeString()}.`
+        error: `You have used all ${MAX_DAILY_CALLS} of your daily AI fact-checks. Resets at ${resetTime?.toLocaleTimeString()}.`,
       });
       return;
     }
 
     setLoading(true);
     setResult(null);
+    setUsedMode(mode);
 
     try {
-      const token = await getAccessTokenSilently();
+      const token = await getToken();
       const response = await fetch(getEndpoint(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userInput }),
+        body: JSON.stringify({ userInput, mode }),
       });
+
+      if (response.status === 429) {
+        setResult({ error: 'You have used all your available AI fact-checks.' });
+        return;
+      }
 
       if (!response.ok) {
         setResult({ error: 'Something went wrong. Please try again.' });
@@ -56,7 +70,7 @@ function FactCheckForm() {
       }
 
       const data = await response.json();
-      if (!isAdmin) incrementUsage();
+      if (!isAdmin) incrementUsage(userId);
       setResult(data);
     } catch (err) {
       setResult({ error: 'Something went wrong. Please try again.' });
@@ -73,7 +87,7 @@ function FactCheckForm() {
         {isAdmin
           ? 'Unlimited access'
           : remaining > 0
-            ? `${remaining} of ${MAX_CALLS} AI checks remaining today`
+            ? `${remaining} of ${MAX_DAILY_CALLS} AI checks remaining today`
             : `Limit reached — resets at ${resetTime?.toLocaleTimeString()}`}
       </p>
 
@@ -93,6 +107,17 @@ function FactCheckForm() {
           {loading ? 'Checking...' : 'Check'}
         </button>
       </form>
+
+      {loading && (
+        <p style={{
+          textAlign: 'center',
+          color: 'var(--text-muted)',
+          fontSize: '0.85rem',
+          margin: '0.5rem 0 0',
+        }}>
+          Analysing your statement...
+        </p>
+      )}
 
       <FactCheckResult result={result} />
     </div>

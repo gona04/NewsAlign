@@ -1,12 +1,20 @@
-// backend/services/vectorStore.js
 import { pipeline } from '@xenova/transformers';
 import faiss from 'faiss-node';
 
 let index = null;
 let storedArticles = [];
+let embedder = null;
+
+async function getEmbedder() {
+  if (!embedder) {
+    console.log('Loading embedder model...');
+    embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    console.log('Embedder model loaded');
+  }
+  return embedder;
+}
 
 export async function buildIndex(articles) {
-  // Handle both string arrays and object arrays
   const validArticles = articles
     .filter(a => a !== null && a !== undefined && a !== '')
     .map(a => typeof a === 'string' ? { headline: a } : a)
@@ -17,12 +25,12 @@ export async function buildIndex(articles) {
     return;
   }
 
-  const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  const embed = await getEmbedder();
   const embeddings = [];
   storedArticles = [];
 
   for (const article of validArticles) {
-    const output = await embedder(article.headline, { pooling: 'mean', normalize: true });
+    const output = await embed(article.headline, { pooling: 'mean', normalize: true });
     embeddings.push(Array.from(output.data));
     storedArticles.push(article);
   }
@@ -41,14 +49,14 @@ export async function searchIndex(query, topK = 3) {
     throw new Error('Index not built yet');
   }
 
-  const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-  const output = await embedder(query, { pooling: 'mean', normalize: true });
+  const embed = await getEmbedder();
+  const output = await embed(query, { pooling: 'mean', normalize: true });
   const queryVec = Array.from(output.data);
 
   const actualTopK = Math.min(topK, storedArticles.length);
   const result = index.search(queryVec, actualTopK);
 
   return result.labels
-    .filter(i => i !== -1 && i < storedArticles.length) // ← filter invalid labels
+    .filter(i => i !== -1 && i < storedArticles.length)
     .map(i => storedArticles[i]);
 }

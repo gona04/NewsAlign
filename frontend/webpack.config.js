@@ -4,17 +4,17 @@ const webpack = require("webpack");
 const dotenv = require("dotenv");
 
 module.exports = (env, argv) => {
-  // Choose the correct .env file based on mode
   const mode = argv.mode || "development";
   const envFile =
     mode === "production" ? "./.env.production" : "./.env.development";
   dotenv.config({ path: envFile });
+
   console.log("Using API URL:", process.env.REACT_APP_API_URL);
 
   return {
     entry: "./src/index.js",
     output: {
-      filename: "bendle.js",
+      filename: "[name].[contenthash].js",
       path: path.resolve(__dirname, "dist"),
       clean: true,
     },
@@ -34,6 +34,32 @@ module.exports = (env, argv) => {
           },
         },
       ],
+    },
+    optimization: {
+      splitChunks: {
+        chunks: "all",
+        cacheGroups: {
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react-vendor",
+            chunks: "all",
+            priority: 30,
+          },
+          auth0: {
+            test: /[\\/]node_modules[\\/](@auth0)[\\/]/,
+            name: "auth0-vendor",
+            chunks: "all",
+            priority: 20,
+          },
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+            priority: 10,
+          },
+        },
+      },
+      runtimeChunk: "single",
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -62,6 +88,12 @@ module.exports = (env, argv) => {
       },
       port: 3030,
       hot: true,
+      headers: {
+        "Cache-Control": "max-age=31536000",
+      },
+    },
+    performance: {
+      hints: false,
     },
     mode,
   };

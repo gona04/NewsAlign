@@ -4,8 +4,8 @@ const FactCheckContext = createContext();
 
 export function FactCheckProvider({ children }) {
   const [mode, setMode] = useState('nlp');
+  const [usedMode, setUsedMode] = useState('nlp');
 
-  // Kept for backward compatibility with FactCheckResult
   const isNLP = mode !== 'llm';
 
   const apiBase = {
@@ -15,7 +15,7 @@ export function FactCheckProvider({ children }) {
   }[mode];
 
   return (
-    <FactCheckContext.Provider value={{ mode, setMode, isNLP, apiBase }}>
+    <FactCheckContext.Provider value={{ mode, setMode, usedMode, setUsedMode, isNLP, apiBase }}>
       {children}
     </FactCheckContext.Provider>
   );

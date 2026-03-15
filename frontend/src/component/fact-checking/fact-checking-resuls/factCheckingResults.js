@@ -2,9 +2,11 @@ import React from 'react';
 import { useFactCheck } from '../../../context/FactCheckContext';
 
 function FactCheckResult({ result }) {
-  const { isNLP } = useFactCheck();
+  const { usedMode } = useFactCheck();
 
   if (!result) return null;
+
+  const isNLP = usedMode === 'nlp' || usedMode === 'nlp-vector';
 
   return (
     <div className="fact-result">
@@ -12,7 +14,7 @@ function FactCheckResult({ result }) {
 
       {isNLP ? (
         <>
-          {result.matches && (
+          {result.matches && result.matches.length > 0 && (
             <div className="fact-matches">
               <h3>Top Matches:</h3>
               <ul>
@@ -22,7 +24,9 @@ function FactCheckResult({ result }) {
               </ul>
             </div>
           )}
-          {result.result && <pre className="fact-output">{result.result}</pre>}
+          {result.result && (
+            <pre className="fact-output">{result.result.trim()}</pre>
+          )}
         </>
       ) : (
         <>

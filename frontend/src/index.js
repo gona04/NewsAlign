@@ -1,38 +1,51 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import { FactCheckProvider } from './context/FactCheckContext';
-import News from './component/news/news';
-import FactCheckForm from './component/fact-checking/fact-checking-form';
-import ModeSelector from './component/mode-selector/mode-selector';
 import LoginPage from './component/auth/login/login-page';
 import UserMenu from './component/auth/user-menu/user-menue';
 import './style.css';
 
+const News = lazy(() => import('./component/news/news'));
+const FactCheckForm = lazy(() => import('./component/fact-checking/fact-checking-form'));
+const ModeSelector = lazy(() => import('./component/mode-selector/mode-selector'));
+
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
 
+  // Show login page immediately while Auth0 checks session
+  // This prevents the blank/spinning screen on first load
+  if (!isAuthenticated && !isLoading) return <LoginPage />;
+
+  // Show a minimal loading state only during the Auth0 session check
   if (isLoading) {
     return (
-      <div className="app-shell">
-        <div className="app-container" style={{ textAlign: 'center', padding: '2rem' }}>
-          Loading...
+      <div className="auth-container">
+        <div className="auth-card">
+          <h1 className="auth-title">Fact Checker</h1>
+          <p className="auth-subtitle" style={{ opacity: 0.5 }}>Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) return <LoginPage />;
-
   return (
     <div className="app-shell">
       <div className="app-header app-container">
         <h1 className="app-title">Fact Checker</h1>
-        <UserMenu />
+        <Suspense fallback={<div style={{ padding: '0.5rem' }}>...</div>}>
+          <UserMenu />
+        </Suspense>
       </div>
-      <ModeSelector />
-      <News />
-      <FactCheckForm />
+      <Suspense fallback={
+        <div className="app-container" style={{ padding: '1rem', color: 'var(--text-muted)' }}>
+          Loading...
+        </div>
+      }>
+        <ModeSelector />
+        <News />
+        <FactCheckForm />
+      </Suspense>
     </div>
   );
 }
@@ -46,6 +59,8 @@ root.render(
       redirect_uri: window.location.origin,
       audience: process.env.REACT_APP_0_AUTH_FACT_CHECKING_APP_AUDIENCE,
     }}
+    useRefreshTokens={true}
+    cacheLocation="localstorage"
   >
     <FactCheckProvider>
       <App />

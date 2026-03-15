@@ -1,12 +1,16 @@
 import express from 'express';
-import { classify, news, vectorClassify } from '../controller/classifyController.js';
+import { classify, vectorClassify, news } from '../controller/classifyController.js';
 import { getUsageStats } from '../controller/usageController.js';
 
-const router = express.Router();
+const protectedRouter = express.Router();
+const publicRouter = express.Router();
 
-router.post('/classify', classify);
-router.post('/vector-classify', vectorClassify)
-router.get('/news', news);
-router.get('/usage', getUsageStats);
+// Public routes — no auth required
+publicRouter.get('/news', news);
 
-export default router;
+// Protected routes — require valid Auth0 JWT token
+protectedRouter.post('/classify', classify);
+protectedRouter.post('/vector-classify', vectorClassify);
+protectedRouter.get('/usage', getUsageStats);
+
+export { protectedRouter, publicRouter };
