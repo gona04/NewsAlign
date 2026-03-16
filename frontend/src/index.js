@@ -18,7 +18,7 @@ function App() {
     return (
       <div className="auth-container">
         <div className="auth-card">
-          <h1 className="auth-title">Fact Checker</h1>
+          <h1 className="auth-title">News Align</h1>
           <p className="auth-subtitle" style={{ opacity: 0.5 }}>Loading...</p>
         </div>
       </div>
@@ -31,7 +31,7 @@ function App() {
     <UsageLimitProvider>
       <div className="app-shell">
         <div className="app-header app-container">
-          <h1 className="app-title">Fact Checker</h1>
+          <h1 className="app-title">News Align</h1>
           <Suspense fallback={<div style={{ padding: '0.5rem' }}>...</div>}>
             <UserMenu />
           </Suspense>

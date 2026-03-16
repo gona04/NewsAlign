@@ -82,7 +82,7 @@ function FactCheckForm() {
 
   return (
     <div className="app-container fact-form-container">
-      <h2 className="fact-form-title">Fact Check a Statement</h2>
+      <h2 className="fact-form-title">News Align A Statement</h2>
 
       <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
         {isAdmin

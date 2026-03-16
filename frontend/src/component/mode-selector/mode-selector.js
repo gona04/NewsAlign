@@ -7,7 +7,7 @@ function ModeSelector() {
 
   return (
     <div className="app-container mode-selector">
-      <label htmlFor="mode-select">Fact-Check Mode</label>
+      <label htmlFor="mode-select">News Align Mode</label>
       <select
         className="neu-select"
         id="mode-select"
