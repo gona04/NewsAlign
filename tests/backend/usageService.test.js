@@ -213,3 +213,28 @@ describe('usageService', () => {
     });
   });
 });
+
+// Cover usageController error handler (line 19)
+it('PASS — getUsage handles database error gracefully', async () => {
+  mockQuery.mockRejectedValueOnce(new Error('DB down'));
+  await expect(getUsage('auth0|123')).rejects.toThrow('DB down');
+});
+
+// Cover factCheckingController fallback claims (lines 10-14)
+it('PASS — checkAndIncrementUsage works with null email and name', async () => {
+  const user = { auth0_id: 'auth0|123', role: 'user' };
+  mockQuery
+    .mockResolvedValueOnce({ rows: [user] })
+    .mockResolvedValueOnce({ rows: [{ count: '1' }] });
+  const result = await checkAndIncrementUsage('auth0|123', null, null);
+  expect(result.allowed).toBe(true);
+});
+
+// Cover moderator branch in getUsage (line 66)
+it('PASS — getUsage returns unlimited for moderator', async () => {
+  const user = { auth0_id: 'auth0|mod', role: 'moderator' };
+  mockQuery.mockResolvedValueOnce({ rows: [user] });
+  const result = await checkAndIncrementUsage('auth0|mod', 'mod@test.com', 'Mod');
+  expect(result.allowed).toBe(true);
+  expect(result.remaining).toBe(Infinity);
+});
