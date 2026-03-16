@@ -11,3 +11,5 @@ yarn-debug.log*
 yarn-error.log*
 scraped_data/
 global-bundle.pem
+# Local Netlify folder
+.netlify

@@ -9,7 +9,7 @@ import './db/client.js';
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3030', 'https://your-app.netlify.app'],
+  origin: ['http://localhost:3030', 'https://news-align.netlify.app', 'https://69b800dd030f1fa15bcbd167--news-align.netlify.app'],
 }));
 
 app.use(express.json());
