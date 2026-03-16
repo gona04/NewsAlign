@@ -4,14 +4,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node backend/application-api.js",
+    "start": "curl -o backend/db/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem && node backend/application-api.js",
     "start:frontend": "cd frontend && webpack serve --config webpack.config.js",
     "build:frontend": "cd frontend && npx webpack --config webpack.config.js",
     "test": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest",
     "test:backend": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest tests/backend",
-    "test:frontend": "node --experimental-vm-modules node_modules/.bin/jest tests/frontend",
-    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
+    "test:frontend": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest tests/frontend",
+    "test:watch": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest --coverage"
   },
   "keywords": [],
   "author": "",
