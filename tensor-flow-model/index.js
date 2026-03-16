@@ -1,4 +1,4 @@
-import callingScaper from "./scraping/callingNewsPortals.js";
+import callingScaper from "./scraping/callingNewsPortals";
 
 const main = async () => {
   console.log("Starting all scrapers...");

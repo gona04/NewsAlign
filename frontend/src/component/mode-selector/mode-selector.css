@@ -1,0 +1,12 @@
+.drop-down-container {
+    width: 95vw;
+    display: flex;
+    justify-content: end;
+    height: 4rem;
+    align-items: center;
+    gap: 1rem;
+}
+
+select{
+    height:2rem;
+}
