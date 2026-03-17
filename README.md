@@ -7,7 +7,7 @@ This is not just a similarity tool — it’s a system designed to highlight the
 ---
 
 ## 🚀 Live Demo
-Frontend: https://news-align.netlify.app/  
+App Demo: https://news-align.netlify.app/  
 GitHub: https://github.com/gona04/NewsAlign  
 
 ---
