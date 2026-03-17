@@ -1,35 +1,157 @@
-📰 Fact-Checking Web App
-A full-stack MERN application that scrapes news headlines from multiple portals and leverages TensorFlow.js Universal Sentence Encoder to help users fact-check statements in real time.
+# 📰 NewsAlign v2 — AI-Powered Fact Checking System
 
-Features
-Web Scraping: Efficiently scrapes news headlines from portals like The Hindu and FactCheck using Cheerio and Axios (no headless browser required).
-Semantic Analysis: Utilizes TensorFlow.js and the Universal Sentence Encoder to compare user input with news headlines for semantic similarity and basic fact classification.
-React Frontend: Responsive UI with environment-based API switching (development/production) using Webpack and .env files.
-Express Backend: REST API for scraping, classification, and serving the frontend in production.
-Cloud-Ready: Backend deployed on Render and frontend on Netlify for a seamless, scalable experience.
-Monorepo Structure: Single node_modules for both backend and frontend, with scripts for easy builds and deployment.
-Challenges & Solutions
-Dynamic Scraping: Transitioned from Puppeteer to Cheerio/Axios for static scraping, enabling cloud deployment and reducing resource usage.
-Environment Management: Implemented a custom Webpack config for smooth API switching between local and production environments.
-Deployment: Unified build and deployment process, serving the frontend from the backend in production for simplicity and efficiency.
-TensorFlow.js Integration: First-time use of the Universal Sentence Encoder for real-world semantic comparison, expanding my experience with machine learning in JavaScript.
-Getting Started
-All dependencies are managed from the project root. No need to run npm install in the frontend folder.
+A full-stack AI application that evaluates how well a statement aligns with real-world news using **semantic search, vector retrieval, and LLM-based reasoning**.
 
-1. Install dependencies (from project root):
-2. Start the backend:
-3. Start the frontend (development mode):
-4. Build the frontend for production:
-Production Deployment
-Deploy the contents of dist to Netlify, or serve it from your backend.
-Backend is ready for deployment on Render or similar Node.js platforms.
-Live Demo
-Frontend: https://fact-checking-app.netlify.app/
-Backend API: https://fact-checking-api.onrender.com
-Tech Stack
-React, Express, Node.js, Cheerio, Axios, TensorFlow.js, Universal Sentence Encoder, Webpack, Render, Netlify
+This is not just a similarity tool — it’s a system designed to highlight the difference between **retrieval and reasoning**.
 
-Note: This is my first project using TensorFlow.js and the Universal Sentence Encoder. The app is a work in progress and open to improvements!
+---
 
-Feel free to fork, contribute, or reach out if you have feedback or opportunities!
-![Demo GIF](/assets/Fact-checking-app-ezgif.com-video-to-gif-converter.gif)
+## 🚀 Live Demo
+Frontend: https://news-align.netlify.app/  
+GitHub: https://github.com/gona04/NewsAlign  
+
+---
+
+## 🧠 Why this project exists
+
+Most NLP-based “fact-checking” systems don’t actually check facts.
+
+They measure **semantic similarity**.
+
+That means:
+- Related statements → high score  
+- Even contradictory statements → high score  
+
+This project was rebuilt to solve that exact limitation.
+
+---
+
+## ⚙️ How it works
+
+The same input statement is evaluated using **three different approaches**:
+
+### 1. NLP Similarity (Baseline)
+- TensorFlow.js Universal Sentence Encoder  
+- Finds *related* headlines  
+- Limitation: cannot detect contradiction  
+
+### 2. Vector Search (FAISS)
+- High-performance semantic retrieval  
+- Finds *most relevant evidence*  
+- Limitation: still no reasoning  
+
+### 3. LLM Reasoning (GPT-4o-mini)
+- Analyzes retrieved headlines  
+- Outputs:
+  - TRUE  
+  - FALSE  
+  - UNCERTAIN  
+- Provides explanation + cited sources  
+
+---
+
+## 🔍 Key Insight
+
+> Retrieval ≠ Reasoning
+
+FAISS improves *what you find*  
+LLMs improve *what you conclude*
+
+---
+
+## 🗞️ Real-Time Data Pipeline
+
+- Daily cron job (8AM IST)
+- Scrapes:
+  - The Hindu  
+  - FactCheck.org  
+- Rebuilds FAISS index daily  
+- Cached on startup → no cold-start delay  
+
+---
+
+## ⚠️ API Usage Limit
+
+LLM mode is limited to **4 requests per user per day**
+
+Reason:
+- LLM calls have real cost  
+- Ensures system sustainability  
+
+NLP + FAISS modes are unlimited.
+
+---
+
+## 🏗️ Architecture Overview
+
+### Frontend
+- React + TypeScript  
+- Context API (state management)  
+- Neumorphic UI system  
+- Webpack (code splitting: 941KB → <300KB)  
+
+### Backend
+- Node.js + Express  
+- REST APIs  
+- JWT Authentication (Auth0)  
+- Rate limiting  
+- Cron jobs (data pipeline)  
+
+### AI / ML
+- TensorFlow.js (Universal Sentence Encoder)  
+- FAISS (vector search)  
+- MiniLM embeddings (@xenova/transformers)  
+- GPT-4o-mini (reasoning layer)  
+
+### Data Layer
+- PostgreSQL (AWS RDS, SSL enabled)  
+- Query logging (user_activity table)  
+- Role-based access (ENUM: user/admin)  
+
+### Infrastructure
+- Railway (backend hosting — always-on)  
+- Netlify (frontend)  
+- AWS RDS (database)  
+- Auth0 (authentication)  
+
+---
+
+## 🔐 Security & System Design Decisions
+
+- ❌ Frontend limits (localStorage) → bypassable  
+- ✅ Backend enforcement using PostgreSQL logs  
+
+Daily usage is calculated using **actual stored activity**, not client-side state.
+
+---
+
+## 🚧 Key Engineering Decisions
+
+- Replaced Puppeteer → Cheerio + Axios  
+  → lighter, faster, cloud-friendly  
+
+- Migrated Render → Railway  
+  → eliminated cold-start delays  
+
+- Cached FAISS index  
+  → instant response on startup  
+
+---
+
+## 🧪 Testing
+
+- Jest test suite  
+- ~40 test cases  
+- ~84% code coverage  
+- Includes:
+  - Service layer tests  
+  - API route tests  
+  - Frontend utility tests  
+
+---
+
+## 📦 Getting Started
+
+### Install dependencies
+```bash
+npm install
